@@ -1,8 +1,3 @@
-
-# coding: utf-8
-
-# In[2]:
-
 import json
 import nltk
 from nltk.corpus import stopwords
@@ -10,13 +5,12 @@ import os
 import glob
 from nltk.stem.porter import *
 from nltk import FreqDist
-path="hotelReviews/"
+path="C:/Users/Thai Phong/Desktop/Sentiment Analysis/LARA_BootStrap/hotelReviews/"
 projectSettings="settings/"
 from collections import defaultdict
 import string
 from Sentence import Sentence
 from Review import Review
-
 class ReadData:
     def __init__(self):
         self.aspectKeywords = {} #aspect name <--> keywords list
@@ -42,7 +36,7 @@ class ReadData:
                 self.aspectKeywords[aspect["name"]] = aspect["keywords"]
 
     def createAspectIndexMapping(self):
-        i=0;
+        i=0
         for aspect in self.aspectKeywords.keys():
             self.aspectIndexMapping[aspect]=i
             i+=1
@@ -99,6 +93,8 @@ class ReadData:
         vocab=[]
         for filename in glob.glob(os.path.join(path, '*.json')):
             fd=open(filename)
+            # import pdb
+            # pdb.set_trace()
             data=json.load(fd)
             for review in data["Reviews"]:
                 self.stemmingStopWRemoval(review,vocab)

@@ -1,7 +1,3 @@
-
-# coding: utf-8
-
-# In[25]:
 from collections import defaultdict
 
 class Review:

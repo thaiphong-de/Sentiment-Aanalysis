@@ -9,7 +9,7 @@ from collections import defaultdict
 from ReadData import ReadData
 from nltk import FreqDist
 import numpy as np
-modelDataDir = "modelData/"
+modelDataDir = "C:/Users/Thai Phong/Desktop/Sentiment Analysis/LARA_BootStrap/modelData/"
 
 class BootStrap:
     def __init__(self, readDataObj):
@@ -33,15 +33,7 @@ class BootStrap:
         self.ratingsList=[]
         #List of Review IDs
         self.reviewIdList=[]
-        
-        '''def calcC1_C2_C3_C4(self):
-            for aspect, sentence in self.corpus.aspectSentences.items():
-                for sentence in sentences:
-                    for word in self.corpus.wordFreq.keys() and not in sentence.wordFreqDict.keys():
-                        self.aspectNotWordMat[aspect][word]+=1
-                    for word,freq in sentence.wordFreqDict.items():
-                        self.aspectWordMat[aspect][word]+=freq
-        '''
+        self.summary=[]
         
     def assignAspect(self, sentence): #assigns aspects to sentence
         sentence.assignedAspect = []
@@ -119,16 +111,22 @@ class BootStrap:
         for review in self.corpus.allReviews:
             #Computing W matrix for each review
             W = defaultdict(lambda: defaultdict(int))
+            V = defaultdict(lambda: defaultdict(int))
             for sentence in review.sentences:
+                V["ReviewID"]=review.reviewId
                 if len(sentence.assignedAspect)==1:
                     for word,freq in sentence.wordFreqDict.items():
                         W[sentence.assignedAspect[0]][word]+=freq
+                        V["aspect"]=W
+                        # import pdb
+                        # pdb.set_trace()
+
             if len(W)!=0:
                 self.wList.append(W)
                 self.ratingsList.append(review.ratings)
-                self.reviewIdList.append(review.reviewId)  
-                
-        
+                self.reviewIdList.append(review.reviewId)
+                self.summary.append(V)
+
     def bootStrap(self):
         changed=True
         while self.iter>0 and changed:
@@ -164,9 +162,4 @@ bootstrapObj.saveToFile("ratingsList.json",bootstrapObj.ratingsList)
 bootstrapObj.saveToFile("reviewIdList.json",bootstrapObj.reviewIdList)
 bootstrapObj.saveToFile("vocab.json",list(bootstrapObj.corpus.wordFreq.keys()))
 bootstrapObj.saveToFile("aspectKeywords.json",bootstrapObj.corpus.aspectKeywords)
-
-
-# In[ ]:
-
-
-
+bootstrapObj.saveToFile("summary.json",bootstrapObj.summary)

@@ -2,13 +2,13 @@
 # coding: utf-8
 
 # In[7]:
-
+import sqlite3
 import numpy as np
 from scipy import optimize
 import json
 import random
 import logging
-modelDataDir = "modelData/"
+modelDataDir = "C:/Users/Thai Phong/Desktop/Sentiment Analysis/LARA_BootStrap/modelData/"
 
 class LRR:
     def __init__(self):
@@ -110,7 +110,7 @@ class LRR:
         #print(self.wordIndexMapping)
     
     def createAspectIndexMapping(self):
-        i=0;
+        i=0
         for aspect in self.aspectKeywords.keys():
             self.aspectIndexMapping[aspect]=i
             self.reverseAspIndexmapping[i]=aspect
@@ -142,7 +142,10 @@ class LRR:
         return Sd
     
     def calcMu(self): #calculates mu for (t+1)th iteration
-        self.mu = np.sum(self.alpha, axis=1).reshape((self.k, 1))/self.Rn
+        # np.seterr(all='ignore')
+        # import pdb
+        # pdb.set_trace()
+        self.mu = np.sum(self.alpha, axis=1).reshape((self.k, 1))/(self.Rn)
         
     def calcSigma(self, updateDiagonalsOnly): #update diagonal entries only
         self.sigma.fill(0)
@@ -352,26 +355,45 @@ class LRR:
             W = self.createWMatrix(self.wList[rIdx])
             Sd = self.calcAspectRatings(W).reshape((self.k,1))
             overallRating = self.calcOverallRating(self.mu,Sd)
+            ReviewId = self.reviewIdList[rIdx]
+            Actual_OverallRating = self.ratingsList[rIdx]["Overall"]
             print("ReviewId-",self.reviewIdList[rIdx])
             print("Actual OverallRating:",self.ratingsList[rIdx]["Overall"])
-            print("Predicted OverallRating:",overallRating)
-            print("Actual vs Predicted Aspect Ratings:")
+            print("Predicted_OverallRating", overallRating)                                                         
             for aspect, rating in self.ratingsList[rIdx].items():
                 if aspect != "Overall" and aspect.lower() in self.aspectIndexMapping.keys():
                     r = self.aspectIndexMapping[aspect.lower()]
                     print("Aspect:",aspect," Rating:",rating, "Predic:", Sd[r])
+                    if aspect == "Service":
+                        Server_rating = rating
+
+                    if aspect == "Cleanliness":
+                       Cleanliness_rating = rating
+
+                    if aspect == "Value":
+                        Value_rating = rating
+
+                    if aspect == "Location":
+                        Location_rating = rating
             if overallRating > 3.0:
-                print("Positive Review")
+                result = "Positive Review"
             else:
-                print("Negative Review")
-            
+                result = "Negative Review"
+            # import pdb
+            # pdb.set_trace()
+            print(result)
+            # sqliteConnection = sqlite3.connect('C:/Users/Thai Phong/Desktop/Sentiment Analysis/venvvirtualenv/ReviewSentiment/review.sqlite3')
+            # cursor = sqliteConnection.cursor()
+            # print("Connected to SQLite")
+            # sqlite_insert_with_param = """INSERT INTO sentiment_review
+            #                 (ReviewId, OverallRating, Service, Cleanliness, Value, Location, Result) 
+            #                 VALUES (?, ?, ?, ?, ?, ?, ?);"""
+
+            # data_tuple = (ReviewId, Actual_OverallRating, Server_rating, Cleanliness_rating, Value_rating, Location_rating, result)
+            # cursor.execute(sqlite_insert_with_param, data_tuple)
+            # sqliteConnection.commit()
+            # cursor.close()
 np.seterr(all='raise')
 lrrObj = LRR()
 lrrObj.EMAlgo(maxIter=10, coverge=0.0001)
 lrrObj.testing()
-
-
-# In[ ]:
-
-
-
